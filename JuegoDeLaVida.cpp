@@ -114,13 +114,36 @@ void Mapa::ciclo()
 
 int main()
 {
-  srand(time(NULL));
-  Mapa mapa(50, 50);
-  while(1)
-    {
-      mapa.dibujar();
-      usleep(100000);
-      system("clear");
-        mapa.ciclo();
-    }
+	int len_i; //Tamaño inicial
+	int len_f; //Tamaño final
+	int step;  //Incremento
+	srand(time(NULL));
+	cout<<endl<<"Ingrese el tamaño inicial o -1 para terminar"<<endl;	
+	cin>>len_i;
+	if(len_i < 1)
+		return -1;
+
+	cout<<endl<<"Ingrese el tamaño final o -1 para terminar"<<endl;	
+	cin>>len_f;
+	if(len_f < len_i)
+		return -1;
+
+	cout<<endl<<"Ingrese incremento o -1 para terminar"<<endl;	
+	cin>>step;
+	if(step < 1)
+		return -1;
+
+	for(int len=len_i; len<=len_f; len += step)
+	{
+		Mapa mapa(len, len);
+		for(int j=0; j<2; ++j)
+		{
+		  mapa.dibujar();
+		  usleep(100000);
+		  system("clear");
+		  mapa.ciclo();
+		}
+	}
+	cout<<"Ejecucion terminada"<<endl;
+	return 0;
 }
