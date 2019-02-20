@@ -3,6 +3,10 @@
 #include <vector>
 #include <unistd.h>
 
+/*-- Root --*/
+#include "TH1F.h"
+#include "TCanvas.h"
+
 using namespace std;
 
 class Mapa{
@@ -130,8 +134,14 @@ int main()
 {
     int len_i; //Tamaño inicial
     int len_f; //Tamaño final
-    int step;  //Incremento
+    int step;  //Incremento    
+    TH1F fData = TH1F("h1","Histograma 1", 10, 0, 30);
+    TCanvas c1("c1","Canvas 1",700,900);
+    char hName[100];
+
     srand(time(NULL));
+
+
     cout<<endl<<"Ingrese el tamaño inicial o -1 para terminar"<<endl;   
     cin>>len_i;
     if(len_i < 1)
@@ -147,16 +157,28 @@ int main()
     if(step < 1)
         return -1;
 
+
     for(int len=len_i; len<=len_f; len += step)
     {
-        Mapa mapa(len, len);
-        for(int j=0; j<2; ++j)
+        fData.Clear();
+        for(int i = 0; i<500; i++)
         {
-          mapa.dibujar();
-          usleep(100000);
-          system("clear");
-          mapa.ciclo();
+            int time = 0;            
+            Mapa mapa(len, len);
+            while(mapa.ciclo())
+            {
+                mapa.dibujar();
+                usleep(100000);
+                system("clear");
+                time++;
+            }
+            fData.Fill(time);
         }
+        sprintf(hName,"n = %d",len);
+        fData.SetTitle(hName);
+        fData.Draw();
+        sprintf(hName,"./img/fig%d.png",len);
+        c1.SaveAs(hName);
     }
     cout<<"Ejecucion terminada"<<endl;
     return 0;
