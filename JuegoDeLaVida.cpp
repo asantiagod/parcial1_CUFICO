@@ -165,7 +165,7 @@ int main()
     int len_i; //Tamaño inicial
     int len_f; //Tamaño final
     int step;  //Incremento    
-    TH1F fData = TH1F("h1","Histograma 1", 10, 0, 30);
+    //TH1F fData = TH1F("h1","Histograma 1", 10, 0, 30);
     TCanvas c1("c1","Canvas 1",700,900);
     char hName[100];
 
@@ -190,18 +190,22 @@ int main()
 
     for(int len=len_i; len<=len_f; len += step)
     {
-        fData.Clear();
-        for(int i = 0; i<500; i++)
+        //fData.Clear();
+        TH1F fData = TH1F("h1","Histograma 1", 10, 0, 30);
+        for(int i = 0; i<20; i++)
         {
             int time = 0;            
             Mapa mapa(len, len);
             while(mapa.ciclo())
             {
-                mapa.dibujar();
-                usleep(100000);
-                system("clear");
+                //mapa.dibujar();
+                //usleep(100000);
+                //system("clear");
                 time++;
             }
+            system("clear");
+            cout<<time<<endl;
+            usleep(100000);
             fData.Fill(time);
         }
         sprintf(hName,"n = %d",len);
