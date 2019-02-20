@@ -6,6 +6,7 @@
 #include "TH1F.h"
 #include "TCanvas.h"
 #include "TF1.h"
+#include "TGraph.h"
 
 /*
  * Se usarán numeros CRC (cyclic redundancy check) para 
@@ -63,8 +64,8 @@ int main(){
                 // system("clear");
                 time++;
             }
-            // system("clear");
-            // cout << time << endl;
+            system("clear");
+            cout << time << endl;
             usleep(100000);
             fData.Fill(time);
             if(time > maxValues[(len - len_i) / step])
@@ -79,6 +80,19 @@ int main(){
         sprintf(hName, "./img/fig%d.png", len);
         c1.SaveAs(hName);
     }
+
+    TGraph* gr = new TGraph();
+    for(int i = 0; i < (int) (len_f - len_i) / step + 1; i++){
+        cout << i << " " << maxValues[i] << endl;
+        gr -> SetPoint(i, i, maxValues[i]);
+    }
+
+    gr -> Draw("AC*");
+
+    while(1)
+        c1.Draw();
+
+    c1.SaveAs("./img/fit1.png");
 
     cout << "Valores maximos y medias para cada n" << endl;
     for(int i = 0; i < (int) (len_f - len_i) / step + 1; i++)
