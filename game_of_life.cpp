@@ -51,7 +51,7 @@ int main()
     ofstream fAllSizes;
     ofstream fNData;
     fAllSizes.open("./files/Medias_Maximos.txt");
-    fAllSizes<<"n\tmaximo\tmedia"<<endl;
+    fAllSizes<<"#n\tmaximo\tmedia"<<endl;
     for(int len = len_i; len <= len_f; len += step)
     {
         sprintf(hName, "./files/datos_n_%d", len);

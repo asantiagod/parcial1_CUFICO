@@ -1,4 +1,4 @@
-n	maximo	media
+#n	maximo	media
 5	9	2.12521
 6	16	6.27104
 7	12	2.94763
