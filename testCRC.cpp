@@ -5,12 +5,13 @@
 
 using namespace std;
 
-const char msg[] = "abcdefghijklmnopqrstuvwxyz";
+//const char msg[] = "abcdefghijklmnopqrstuvwxyz";
 const char numb[]= "123456789";
 const char numb2[]="012345678";
 
 int main()
 {
+    char msg[] = {1,0,1,0,1,0,1,0,1,1,1,0,0,1,0,1,1,1,0,1,0,1,0};
     uCRC_t ucrc;
     uint64_t crc;
     crc = ucrc.get_crc_init();
