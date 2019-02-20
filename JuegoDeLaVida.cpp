@@ -7,6 +7,13 @@
 #include "TH1F.h"
 #include "TCanvas.h"
 
+/*
+ * Se usarán numeros CRC (cyclic redundancy check) para 
+ * diferenciar entre el estado de varios mapas y determinar 
+ * si se ha llegado a un punto estable
+ */
+#include "ucrc_t.h"
+
 using namespace std;
 
 class Mapa{
@@ -162,6 +169,8 @@ int Mapa::ciclo(){
 
 int main()
 {
+    uCRC_t ucrc;
+    
     int len_i; //Tamaño inicial
     int len_f; //Tamaño final
     int step;  //Incremento    
