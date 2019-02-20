@@ -7,122 +7,152 @@ using namespace std;
 
 class Mapa{
 public:
-  int fil;
-  int col;
-  int vivos;
-  int age = 0;
-  vector<vector<int> > mapa;
-  
-  Mapa(int f, int c);
-  void reset(int f, int c);
-  void dibujar();
-  int analizarVecinos(int posf, int posc);
-  int ciclo();
+    int fil;
+    int col;
+    int vivos;
+    vector<vector<int> > mapa;
+    vector<vector<int> > mapa1;
+    vector<vector<int> > mapa2;
+
+    Mapa(int f, int c);
+    void reset(int f, int c);
+    int compareWith(int tipo);
+    void dibujar();
+    int analizarVecinos(int posf, int posc);
+    int ciclo();
 };
 
 
 Mapa::Mapa(int f, int c){
-  reset(f, c);
+    reset(f, c);
 }
 
 
 void Mapa::reset(int f, int c){
-  fil = f;
-  col = c;
-  mapa.resize(fil);
-  for(int i=0; i<mapa.size(); i++){
-    mapa[i].resize(col);
-  }
-  vivos = 0;
-  for(int f=0; f<fil; f++){
-    for(int c=0; c<col; c++){
-      if (rand()%2){
-        mapa[f][c] = 1;
-        vivos++;
-      }
+    fil = f;
+    col = c;
+    mapa.resize(fil);
+    for(int i = 0; i < mapa.size(); i++){
+        mapa[i].resize(col);
     }
-  }
+
+    vivos = 0;
+    for(int f = 0; f < fil; f++){
+        for(int c = 0; c < col; c++){
+            if(rand() % 2){
+                mapa[f][c] = 1;
+                vivos++;
+            }
+            else
+                mapa[f][c] = 0;
+        }
+    }
+
+    mapa1 = mapa;
+    mapa2 = mapa;
+}
+
+
+int Mapa::compareWith(int tipo){
+    vector<vector<int> > copia;
+
+    if(tipo == 1)
+        copia = mapa1;
+    else
+        copia = mapa2;
+    for(int i = 0; i < fil; i++){
+        for(int j = 0; j < col; j++){
+            if(copia[i][j] != mapa[i][j])
+                return 0;
+        }
+    }
+
+    return 1;
 }
 
 
 void Mapa::dibujar(){
-  for(int f=0; f<fil; f++){
-    for(int c=0; c<col; c++){
-        if(mapa[f][c] == 1)
-          cout << "* ";
-        else
-          cout << ". ";
+    for(int f = 0; f < fil; f++){
+        for(int c = 0; c < col; c++){
+            if(mapa[f][c] == 1)
+                cout << "* ";
+            else
+                cout << ". ";
+        }
+        cout << "\n";
     }
-    cout << "\n";
-  }
-  cout << age << " " << vivos << "\n";
+    cout << vivos << "\n";
 }
 
 
-int Mapa::analizarVecinos(int posf, int posc)
-{
-  int vecinos = 0;
-  if(posf-1 >= 0 and posc-1 >= 0)
-    if(mapa[posf-1][posc-1] == 1)
-      vecinos++;
-  if(posf-1 >= 0)
-    if(mapa[posf-1][posc] == 1)
-      vecinos++;
-  if(posf-1 >= 0 and posc+1 <= col-1)
-    if(mapa[posf-1][posc+1] == 1)
-      vecinos++;
-  if(posc-1 >= 0)
-    if(mapa[posf][posc-1] == 1)
-      vecinos++;
-  if(posc+1 <= col-1)
-    if(mapa[posf][posc+1] == 1)
-      vecinos++;
-  if(posf+1 <= fil-1 and posc-1 >= 0)
-    if(mapa[posf+1][posc-1] == 1)
-      vecinos++;
-  if(posf+1 <= fil-1)
-    if(mapa[posf+1][posc] == 1)
-      vecinos++;
-  if(posf+1 <= fil-1 and posc+1 <= col-1)
-    if(mapa[posf+1][posc+1] == 1)
-      vecinos++;
-  return vecinos;
+int Mapa::analizarVecinos(int posf, int posc){
+    int vecinos = 0;
+    if(posf - 1 >= 0 and posc - 1 >= 0)
+        if(mapa[posf - 1][posc - 1] == 1)
+            vecinos++;
+    if(posf - 1 >= 0)
+        if(mapa[posf - 1][posc] == 1)
+            vecinos++;
+    if(posf - 1 >= 0 and posc + 1 <= col - 1)
+        if(mapa[posf - 1][posc + 1] == 1)
+            vecinos++;
+    if(posc - 1 >= 0)
+        if(mapa[posf][posc - 1] == 1)
+            vecinos++;
+    if(posc + 1 <= col - 1)
+        if(mapa[posf][posc + 1] == 1)
+            vecinos++;
+    if(posf + 1 <= fil - 1 and posc - 1 >= 0)
+        if(mapa[posf + 1][posc - 1] == 1)
+            vecinos++;
+    if(posf + 1 <= fil - 1)
+        if(mapa[posf + 1][posc] == 1)
+            vecinos++;
+    if(posf + 1 <= fil - 1 and posc + 1 <= col - 1)
+        if(mapa[posf + 1][posc + 1] == 1)
+            vecinos++;
+    return vecinos;
 }
 
 int Mapa::ciclo(){
-  vector<vector<int> > nueva_conf = mapa;
-  int vivosTemp = 0;
+    vector<vector<int> > nueva_conf = mapa;
+    int vivosTemp = 0;
 
-  for (int f=0; f<fil; f++){
-    for(int c=0; c<col; c++){
-        int n_vecinos = analizarVecinos(f, c);
-        if(mapa[f][c] == 0){
-          if(n_vecinos == 3){
-              nueva_conf[f][c] = 1;
-          vivosTemp++;
+    for (int f = 0; f < fil; f++){
+        for(int c = 0; c < col; c++){
+            int n_vecinos = analizarVecinos(f, c);
+            if(mapa[f][c] == 0){
+                if(n_vecinos == 3){
+                    nueva_conf[f][c] = 1;
+                    vivosTemp++;
+                }else
+                    nueva_conf[f][c] = 0;
+            }
+            if (mapa[f][c] == 1){
+                if(n_vecinos == 2 || n_vecinos == 3){
+                    nueva_conf[f][c] = 1;
+                    vivosTemp++;
+                }
+                else
+                    nueva_conf[f][c] = 0;
+            }
         }
-          else
-              nueva_conf[f][c] = 0;
-      }
-        if (mapa[f][c] == 1){
-          if(n_vecinos == 2 || n_vecinos == 3){
-              nueva_conf[f][c] = 1;
-          vivosTemp++;
-        }
-          else
-              nueva_conf[f][c] = 0;
-      }
     }
-  }
 
-  if(vivos != vivosTemp){
+
     mapa = nueva_conf;
-    vivos = vivosTemp;
-    age++;
-    return 1;
-  }
+    if(not vivos)
+      return 0;
+    if(compareWith(1) || compareWith(2)){
+        mapa2 = mapa1;
+        mapa1 = mapa;
+        return 1;
+    }if(vivos != vivosTemp){
+        vivos = vivosTemp;
+        return 1;
+    }
 
-  return 0;
+    return 0;
 }
 
 
