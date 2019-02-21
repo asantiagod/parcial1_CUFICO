@@ -19,12 +19,10 @@ void Board::reset(int f, int c){
         board[i].resize(columns);
     }
 
-    alive = 0;
     for(int f = 0; f < rows; f++){
         for(int c = 0; c < columns; c++){
             if(rand() % 2){
                 board[f][c] = 1;
-                alive++;
             }
             else
                 board[f][c] = 0;
@@ -33,7 +31,7 @@ void Board::reset(int f, int c){
 
     uint64_t localCrc = getCrc();
 
-    for (int i = 0; i < 20; i++){
+    for (int i = 0; i < PERIOD; i++){
         crc[i] = localCrc;
     }
 }
@@ -65,10 +63,10 @@ int Board::compareCrc(){
     uint64_t currentCrc = localCrc;
     uint64_t tempCrc;
 
-    for (int i = 0; i < 20; ++i){
+    for (int i = 0; i < PERIOD; i++){
         if (crc[i] == localCrc)
             return 0;
-        
+
         tempCrc = crc[i];
         crc[i] = currentCrc;
         currentCrc = tempCrc;
@@ -88,7 +86,6 @@ void Board::draw(){
         }
         cout << "\n";
     }
-    cout << alive << "\n";
 }
 
 
@@ -123,7 +120,6 @@ int Board::countNeighbors(int row, int column){
 
 int Board::loop(){
     vector<vector<int> > nueva_conf = board;
-    int aliveTemp = 0;
 
     for (int f = 0; f < rows; f++){
         for(int c = 0; c < columns; c++){
@@ -131,14 +127,12 @@ int Board::loop(){
             if(board[f][c] == 0){
                 if(n_vecinos == 3){
                     nueva_conf[f][c] = 1;
-                    aliveTemp++;
                 }else
                     nueva_conf[f][c] = 0;
             }
             if (board[f][c] == 1){
                 if(n_vecinos == 2 || n_vecinos == 3){
                     nueva_conf[f][c] = 1;
-                    aliveTemp++;
                 }
                 else
                     nueva_conf[f][c] = 0;
@@ -146,19 +140,11 @@ int Board::loop(){
         }
     }
 
-
     board = nueva_conf;
 
-    if(not alive)
-      return 0;
     // si el crc es distinto a los de la lista es porque no hay ciclo
-    if(compareCrc()){
-        alive = aliveTemp;
+    if(compareCrc())
         return 1;
-    }if(alive != aliveTemp){
-        alive = aliveTemp;
-        return 1;
-    }
 
     return 0;
 }
