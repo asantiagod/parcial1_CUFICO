@@ -1,1 +1,1 @@
-g++ JuegoDeLaVida.cpp ucrc_t.cpp -o ./bin/jdlv `root-config --cflags --glibs`
+g++ game_of_life.cpp board.cpp -o /jdlv `root-config --cflags --glibs`

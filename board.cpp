@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "board.h"
+#include "ucrc_t.h"
 
 using namespace std;
 
@@ -30,23 +31,47 @@ void Board::reset(int f, int c){
         }
     }
 
-    board1 = board;
-    board2 = board;
+    uint64_t localCrc = getCrc();
+
+    for (int i = 0; i < 20; i++){
+        crc[i] = localCrc;
+    }
 }
 
 
-int Board::compareWith(int tipo){
-    vector<vector<int> > copia;
+uint64_t Board::getCrc(){
+    char msg[rows * columns];
 
-    if(tipo == 1)
-        copia = board1;
-    else
-        copia = board2;
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < columns; j++){
-            if(copia[i][j] != board[i][j])
-                return 0;
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < columns; j++){
+            msg[columns * i + j] = board[i][j];
         }
+    }
+
+    uCRC_t ucrc;
+    uint64_t localCrc;
+
+    localCrc = ucrc.get_crc_init();
+    localCrc = ucrc.get_raw_crc(msg, sizeof(msg), localCrc);
+    localCrc = ucrc.get_final_crc(localCrc);
+
+    return localCrc;
+}
+
+
+int Board::compareCrc(){
+    uint64_t localCrc = getCrc();
+
+    uint64_t currentCrc = localCrc;
+    uint64_t tempCrc;
+
+    for (int i = 0; i < 20; ++i){
+        if (crc[i] == localCrc)
+            return 0;
+        
+        tempCrc = crc[i];
+        crc[i] = currentCrc;
+        currentCrc = tempCrc;
     }
 
     return 1;
@@ -126,9 +151,9 @@ int Board::loop(){
 
     if(not alive)
       return 0;
-    if(compareWith(1) || compareWith(2)){
-        board2 = board1;
-        board1 = board;
+    // si el crc es distinto a los de la lista es porque no hay ciclo
+    if(compareCrc()){
+        alive = aliveTemp;
         return 1;
     }if(alive != aliveTemp){
         alive = aliveTemp;
