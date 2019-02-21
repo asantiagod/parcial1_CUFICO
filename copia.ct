@@ -63,7 +63,7 @@ int main()
             int time = 0;
             Board board(len, len);
             while(board.loop()){
-                //board.draw();
+                board.draw();
                 //cout << time << endl;
                 //usleep(100000);
                 //system("clear");

@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "board.h"
+#include "ucrc_t.h"
 
 using namespace std;
 
@@ -18,35 +19,57 @@ void Board::reset(int f, int c){
         board[i].resize(columns);
     }
 
-    alive = 0;
     for(int f = 0; f < rows; f++){
         for(int c = 0; c < columns; c++){
             if(rand() % 2){
                 board[f][c] = 1;
-                alive++;
             }
             else
                 board[f][c] = 0;
         }
     }
 
-    board1 = board;
-    board2 = board;
+    uint64_t localCrc = getCrc();
+
+    for (int i = 0; i < PERIOD; i++){
+        crc[i] = localCrc;
+    }
 }
 
 
-int Board::compareWith(int tipo){
-    vector<vector<int> > copia;
+uint64_t Board::getCrc(){
+    char msg[rows * columns];
 
-    if(tipo == 1)
-        copia = board1;
-    else
-        copia = board2;
-    for(int i = 0; i < rows; i++){
-        for(int j = 0; j < columns; j++){
-            if(copia[i][j] != board[i][j])
-                return 0;
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < columns; j++){
+            msg[columns * i + j] = board[i][j];
         }
+    }
+
+    uCRC_t ucrc;
+    uint64_t localCrc;
+
+    localCrc = ucrc.get_crc_init();
+    localCrc = ucrc.get_raw_crc(msg, sizeof(msg), localCrc);
+    localCrc = ucrc.get_final_crc(localCrc);
+
+    return localCrc;
+}
+
+
+int Board::compareCrc(){
+    uint64_t localCrc = getCrc();
+
+    uint64_t currentCrc = localCrc;
+    uint64_t tempCrc;
+
+    for (int i = 0; i < PERIOD; i++){
+        if (crc[i] == localCrc)
+            return 0;
+
+        tempCrc = crc[i];
+        crc[i] = currentCrc;
+        currentCrc = tempCrc;
     }
 
     return 1;
@@ -63,7 +86,6 @@ void Board::draw(){
         }
         cout << "\n";
     }
-    cout << alive << "\n";
 }
 
 
@@ -98,7 +120,6 @@ int Board::countNeighbors(int row, int column){
 
 int Board::loop(){
     vector<vector<int> > nueva_conf = board;
-    int aliveTemp = 0;
 
     for (int f = 0; f < rows; f++){
         for(int c = 0; c < columns; c++){
@@ -106,14 +127,12 @@ int Board::loop(){
             if(board[f][c] == 0){
                 if(n_vecinos == 3){
                     nueva_conf[f][c] = 1;
-                    aliveTemp++;
                 }else
                     nueva_conf[f][c] = 0;
             }
             if (board[f][c] == 1){
                 if(n_vecinos == 2 || n_vecinos == 3){
                     nueva_conf[f][c] = 1;
-                    aliveTemp++;
                 }
                 else
                     nueva_conf[f][c] = 0;
@@ -121,19 +140,11 @@ int Board::loop(){
         }
     }
 
-
     board = nueva_conf;
 
-    if(not alive)
-      return 0;
-    if(compareWith(1) || compareWith(2)){
-        board2 = board1;
-        board1 = board;
+    // si el crc es distinto a los de la lista es porque no hay ciclo
+    if(compareCrc())
         return 1;
-    }if(alive != aliveTemp){
-        alive = aliveTemp;
-        return 1;
-    }
 
     return 0;
 }
